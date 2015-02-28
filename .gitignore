@@ -1,0 +1,8 @@
+*.html
+*~
+elm-stuff
+repl-temp-*
+.cabal-sandbox
+cabal.sandbox.config
+temperature
+elm.js
