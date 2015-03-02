@@ -39,6 +39,6 @@ display x = case x of
               Err e -> flow down [ plainText e ]
 
 query : String -> Signal (Response String)
-query b = get ("http://localhost/api/v1.0.0/brands/?type=json&q=%22%25" ++ b ++ "%25%22")
+query b = get ("http://localhost/api/v1.0.0/brands/?type=json&q=%25" ++ b ++ "%25")
         |> constant
         |> send
