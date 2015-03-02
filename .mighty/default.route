@@ -18,6 +18,6 @@
 # Either "host" or ":port" can be committed, but not both.
 # /app/cal/        >> example.net/calendar/
 # rest api in the same server
-# /api/       >> 127.0.0.1:3000/
+/api/       >> 127.0.0.1:3000/
 
 # /                -> /export/www/
