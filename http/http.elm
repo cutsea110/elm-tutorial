@@ -32,13 +32,13 @@ result res =
       Failure n a -> "Failure " ++ toString n ++ " " ++ a
 
 main : Signal Element
-main = (display << decodeString brands << result) <~ query "445"
+main = (display << decodeString brands << result) <~ query "44"
 
 display x = case x of
               Ok {items} -> flow down <| map asText items
               Err e -> flow down [ plainText e ]
 
 query : String -> Signal (Response String)
-query b = get ("http://localhost/api/v1.0.0/brands/?type=json&q=%25" ++ b ++ "%25")
+query b = get ("http://localhost/api/v1.0.0/brands/?type=json&q=" ++ b)
         |> constant
         |> send
