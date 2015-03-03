@@ -78,7 +78,7 @@ rangeInput max current =
              , input [ type' "range"
                      , value (toString current)
                      , Attr.max (toString max)
-                     , on "input" targetValue (send appChannel << ArchiveSelect << toInt')] []
+                     , on "input" targetValue (send appChannel << ArchiveSelect << toInt' << Debug.watch "range: ")] []
              , text <| toString max]
            , text (toString current)]
 
@@ -101,15 +101,15 @@ listHtml str = li [] [text str]
 textbox : String -> Html
 textbox str = input [ value str
                     , id "nameInput"
-                    , on "input" targetValue (send appChannel << Input)
-                    , on "keydown" eventObjDecoder (send appChannel)]
+                    , on "input" targetValue (send appChannel << Input << Debug.watch "input: ")
+                    , on "keydown" eventObjDecoder (send appChannel << Debug.watch "keydown: ")]
                     []
 
 eventObjDecoder : Json.Decoder Actions
 eventObjDecoder =
     Json.customDecoder
         (Json.object2 (,) keyCode targetValue)
-        (\(num, str) ->
+        (\(num, str) -> 
             if | num == 8 && String.isEmpty str -> Ok (Delete ())
                | num == 13 && (not <| String.isEmpty str) -> Ok (Add str)
                | otherwise -> Err "")
