@@ -36,14 +36,14 @@ result res =
       Failure n a -> "Failure " ++ toString n ++ " " ++ a
 
 main : Signal Element
-main = view <~ query ~ codeField -- (display << decodeString brands << result) <~ query
+main = view <~ query ~ codeField
        
 display x = case x of
               Ok {items} -> flow down <| List.map asText items
               Err e -> flow down [ plainText e ]
 
 query : Signal (Response String)
-query = Http.send <| httpGet <~ (.string <~ subscribe code)
+query = Http.send <| httpGet << .string <~ subscribe code
 
 httpGet : String -> Request String
 httpGet b = Http.get ("http://localhost/api/v1.0.0/brands/?type=json&q=" ++ b)
