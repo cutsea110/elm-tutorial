@@ -3,42 +3,56 @@ module App where
 import Graphics.Element (..)
 import Graphics.Input.Field (..)
 import Signal (..)
-import String
+import Http (Request, Response(..))
+import Http
+import Text (asText, plainText)
 import List
-import Text (plainText)
-import Debug
+import Json.Decode (decodeString, int, string, (:=), list, object2, object3, Decoder)
 
-type alias CandidateList = List String
-type alias Model = { content : Content
-                   , candidateList : CandidateList
-                   }
+type alias Item = { brandCode : String, brandName : String }
+type alias Brands = { offset : Int
+                    , count : Int
+                    , items : List Item
+                    }
 
-initModel : Model
-initModel = { content = noContent, candidateList = [] }
+brands : Decoder Brands
+brands = object3 Brands
+      ("offset" := int)
+      ("count" := int)
+      ("items" := items)
 
-appChannel : Channel Content
-appChannel = channel noContent
+items : Decoder (List Item)
+items = list item
 
-data : List String
-data = [ "1111"
-       , "1123"
-       , "1234"
-       , "1345"
-       , "1678"
-       ]
+item : Decoder Item
+item = object2 Item
+        ("brandCode" := string)
+        ("brandName" := string)
 
-model : Signal Model
-model = foldp update initModel (subscribe appChannel)
-
-update : Content -> Model -> Model
-update content model = {model| content <- content
-                       , candidateList <- List.filter (String.contains content.string) data }
+result res =
+    case res of
+      Success a -> a
+      Waiting -> "Waiting"
+      Failure n a -> "Failure " ++ toString n ++ " " ++ a
 
 main : Signal Element
-main = display << Debug.watch "model:" <~ model
+main = view <~ query ~ codeField -- (display << decodeString brands << result) <~ query
+       
+display x = case x of
+              Ok {items} -> flow down <| List.map asText items
+              Err e -> flow down [ plainText e ]
 
-display : Model -> Element
-display {content, candidateList} =
-    (field defaultStyle (send appChannel) "Code" content)
-    `above`
-    (flow down <| List.map plainText candidateList)
+query : Signal (Response String)
+query = Http.send <| httpGet <~ (.string <~ subscribe code)
+
+httpGet : String -> Request String
+httpGet b = Http.get ("http://localhost/api/v1.0.0/brands/?type=json&q=" ++ b)
+
+code : Channel Content
+code = channel noContent
+
+codeField : Signal Element
+codeField = field defaultStyle (send code) "Code" <~ subscribe code
+
+view : Response String -> Element -> Element
+view res c = c `above` (display (decodeString brands (result res)))
