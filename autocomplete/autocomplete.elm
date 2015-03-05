@@ -39,7 +39,7 @@ result res =
       Failure n a -> "Failure " ++ toString n ++ " " ++ a
 
 main : Signal Element
-main = view <~ query ~ codeField ~ lastPressed
+main = view <~ lastCode ~ codeField ~ (display << decodeString brands << result <~ query)
 
 display : Result String Brands -> Element
 display x = case x of
@@ -58,8 +58,8 @@ code = channel noContent
 codeField : Signal Element
 codeField = field defaultStyle (send code) "Code" <~ subscribe code
 
-view : Response String -> Element -> KeyCode -> Element
-view res c key = asText (Char.fromCode key) `above` c `above` acomp res
+lastCode : Signal Element
+lastCode = asText << Char.fromCode <~ lastPressed
 
-acomp : Response String -> Element
-acomp = display << decodeString brands << result
+view : Element -> Element -> Element -> Element
+view key c codes = key `above` c `above` codes
