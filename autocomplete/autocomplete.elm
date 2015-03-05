@@ -62,4 +62,5 @@ lastCode : Signal Element
 lastCode = asText << Char.fromCode <~ lastPressed
 
 view : Element -> Element -> Element -> Element
-view key c codes = key `above` c `above` codes
+view key c codes = List.foldr above empty [key, c, codes]
+
