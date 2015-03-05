@@ -8,6 +8,8 @@ import Http
 import Text (asText, plainText)
 import List
 import Json.Decode (decodeString, int, string, (:=), list, object2, object3, Decoder)
+import Keyboard (..)
+import Char
 
 type alias Item = { brandCode : String, brandName : String }
 type alias Brands = { offset : Int
@@ -36,8 +38,9 @@ result res =
       Failure n a -> "Failure " ++ toString n ++ " " ++ a
 
 main : Signal Element
-main = view <~ query ~ codeField
-       
+main = view <~ query ~ codeField ~ lastPressed
+
+display : Result String Brands -> Element
 display x = case x of
               Ok {items} -> flow down <| List.map asText items
               Err e -> flow down [ plainText e ]
@@ -54,5 +57,5 @@ code = channel noContent
 codeField : Signal Element
 codeField = field defaultStyle (send code) "Code" <~ subscribe code
 
-view : Response String -> Element -> Element
-view res c = c `above` (display (decodeString brands (result res)))
+view : Response String -> Element -> KeyCode -> Element
+view res c key = asText (Char.fromCode key) `above` c `above` (display (decodeString brands (result res)))
