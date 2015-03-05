@@ -31,6 +31,7 @@ item = object2 Item
         ("brandCode" := string)
         ("brandName" := string)
 
+result : Response String -> String
 result res =
     case res of
       Success a -> a
@@ -58,4 +59,7 @@ codeField : Signal Element
 codeField = field defaultStyle (send code) "Code" <~ subscribe code
 
 view : Response String -> Element -> KeyCode -> Element
-view res c key = asText (Char.fromCode key) `above` c `above` (display (decodeString brands (result res)))
+view res c key = asText (Char.fromCode key) `above` c `above` acomp res
+
+acomp : Response String -> Element
+acomp = display << decodeString brands << result
