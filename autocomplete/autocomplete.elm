@@ -10,6 +10,7 @@ import List
 import Json.Decode (decodeString, int, string, (:=), list, object2, object3, Decoder)
 import Keyboard (..)
 import Char
+import String
 
 type alias Item = { brandCode : String, brandName : String }
 type alias Brands = { offset : Int
@@ -50,7 +51,8 @@ query : Signal (Response String)
 query = Http.send <| httpGet << .string <~ subscribe code
 
 httpGet : String -> Request String
-httpGet b = Http.get ("http://localhost/api/v1.0.0/brands/?type=json&q=" ++ b)
+httpGet b = let b' = if String.isEmpty b then "dummy" else b
+            in Http.get ("http://localhost/api/v1.0.0/brands/?type=json&q=" ++ b')
 
 code : Channel Content
 code = channel noContent
