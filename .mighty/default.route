@@ -1,7 +1,7 @@
 # Example routing for Mighttpd 2
 
 # Domain lists
-[localhost www.example.com 192.168.11.4]
+[localhost www.example.com 192.168.10.108]
 
 # Entries are looked up in the specified order
 # All paths must end with "/"

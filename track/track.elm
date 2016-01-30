@@ -8,7 +8,7 @@ import Window
 import Time (..)
 
 main : Signal Element
-main = map3 scene Mouse.position Window.dimensions (foldp (\x y -> (x + y)) 0 (fps 30))
+main = map3 scene Mouse.position Window.dimensions (foldp (+) 0 (fps 30))
 
 scene : (Int, Int) -> (Int, Int) -> Float -> Element
 scene (x,y) (w,h) t =
